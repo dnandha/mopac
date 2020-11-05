@@ -4,7 +4,7 @@ params = {
     'domain': 'HalfCheetah',
     'task': 'v2',
 
-    'log_dir': '/work/scratch/dn38jyty/ray_mop',
+    'log_dir': '~/ray_mop',
     'exp_name': 'test',
 
     'kwargs': {

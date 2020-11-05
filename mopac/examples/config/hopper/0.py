@@ -4,7 +4,7 @@ params = {
     'domain': 'Hopper',
     'task': 'v2',
 
-    'log_dir': '/work/scratch/dn38jyty/ray_mopac/',
+    'log_dir': '~/ray_mopac/',
     'exp_name': 'fixedv3',
 
     'kwargs': {
