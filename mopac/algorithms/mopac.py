@@ -512,6 +512,11 @@ class MOPAC(RLAlgorithm):
                 x_acts[r] += 1 * u_delta
                 x_acts[r] = np.clip(x_acts[r], -self.uclip, self.uclip)
 
+                # nan check
+                nan_mask = np.isnan(x_acts[r])
+                if np.any(nan_mask):
+                    x_acts[r][nan_mask] = 0.
+
                 # store first initial observation (and action sequence) belonging to action sequence
                 x_opt_obs[i] = x_obs[l][0]  # initial observation
                 #x_opt_acts[i] = self.U[l][:self._rollout_length]  # truncate
