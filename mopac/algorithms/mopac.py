@@ -399,7 +399,7 @@ class MOPAC(RLAlgorithm):
             print('[ MOPAC ] Updating model pool | {:.2e} --> {:.2e}'.format(
                 self._model_pool._max_size, new_pool_size
             ))
-            samples = self._model_pool.return_all_samples()
+            samples = self._model_pool.return_all_samples()[:new_pool_size]
             new_pool = SimpleReplayPool(obs_space, act_space, new_pool_size)
             new_pool.add_samples(samples)
             assert self._model_pool.size == new_pool.size
@@ -515,7 +515,7 @@ class MOPAC(RLAlgorithm):
                 # nan check
                 nan_mask = np.isnan(x_acts[r])
                 if np.any(nan_mask):
-                    x_acts[r][nan_mask] = 0.
+                    raise Exception("action contains nan value")
 
                 # store first initial observation (and action sequence) belonging to action sequence
                 x_opt_obs[i] = x_obs[l][0]  # initial observation
@@ -932,12 +932,16 @@ class MOPAC(RLAlgorithm):
 
         feed_dict = self._get_feed_dict(iteration, batch)
 
-        (Q_values, Q_losses, alpha, global_step) = self._session.run(
+        (Q_values, Q_losses, alpha, global_step, actions) = self._session.run(
             (self._Q_values,
              self._Q_losses,
              self._alpha,
-             self.global_step),
+             self.global_step,
+             self._actions_ph),
             feed_dict)
+
+        if np.mean(Q_losses) > 1e4:
+            raise Exception("Q value", actions)
 
         (V_values, V_losses, alpha, global_step) = self._session.run(
             (self._V_values,
