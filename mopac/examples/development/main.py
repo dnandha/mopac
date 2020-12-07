@@ -198,6 +198,12 @@ class ExperimentRunner(tune.Trainable):
         initial_exploration_policy = self.initial_exploration_policy = (
             get_policy('UniformPolicy', training_environment))
 
+        #### get termination function
+        environment_params = self._variant['environment_params']
+        domain = environment_params['training']['domain']
+        static_fns = mopac.static[domain.lower()]
+        ####
+
         self.algorithm = get_algorithm_from_variant(
             variant=self._variant,
             training_environment=training_environment,
@@ -206,6 +212,7 @@ class ExperimentRunner(tune.Trainable):
             initial_exploration_policy=initial_exploration_policy,
             Qs=Qs,
             Vs=Vs,
+            static_fns=static_fns,
             pool=replay_pool,
             sampler=sampler,
             session=self._session)
