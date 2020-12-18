@@ -194,11 +194,11 @@ class MOPAC(RLAlgorithm):
         pool = self._pool
         model_metrics = {}
 
-        if not self._training_started:
-            self._init_training()
+        #if not self._training_started:
+        self._init_training()
 
-            self._initial_exploration_hook(
-                training_environment, self._initial_exploration_policy, pool)
+        self._initial_exploration_hook(
+            training_environment, self._initial_exploration_policy, pool)
 
         self.sampler.initialize(training_environment, policy, pool)
 
