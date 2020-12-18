@@ -201,7 +201,7 @@ def get_variant_spec_base(universe, domain, task, policy, algorithm, env_params)
             'checkpoint_at_end': True,
             'checkpoint_frequency': NUM_EPOCHS_PER_DOMAIN.get(
                 domain, DEFAULT_NUM_EPOCHS) // NUM_CHECKPOINTS,
-            'checkpoint_replay_pool': False,
+            'checkpoint_replay_pool': True,
         },
     }
 
