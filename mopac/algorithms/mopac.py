@@ -132,7 +132,7 @@ class MOPAC(RLAlgorithm):
         self._Q_targets = tuple(tf.keras.models.clone_model(Q) for Q in Qs)
 
         self._Vs = Vs
-        self._V_targets = tf.keras.models.clone_model(Vs)
+        self._V_target = tf.keras.models.clone_model(Vs)
 
         self._pool = pool
         self._plotter = plotter
@@ -480,7 +480,7 @@ class MOPAC(RLAlgorithm):
                 # previous next obs becomes last obs for storage
                 x_obs[:,-1] = next_obs
                 # predict terminal reward (normalized dsr)
-                x_total_reward[:,-1] = self._V_targets.predict([x_obs[:,-1]])
+                x_total_reward[:,-1] = self._V_target.predict([x_obs[:,-1]])
 
                 #x_total_reward[:,-1] = self._Vs.predict([x_obs[:,-1]])
                 #next_Qs_values = tuple(Q.predict([obs, next_actions])
@@ -688,8 +688,17 @@ class MOPAC(RLAlgorithm):
         return Q_target
 
     def _get_V_target(self):
-        V_target = self._reward_scale * self._cumrewards_ph
-        return V_target
+        actions = self._policy.actions([self._observations_ph])
+        log_pis = self._policy.log_pis([self._observations_ph], actions)
+
+        Qs_values = tuple(
+            Q([self._observations_ph, actions])
+            for Q in self._Q_targets)
+
+        min_Q = tf.reduce_min(Qs_values, axis=0)
+        value = min_Q - self._alpha * log_pis
+
+        return value
 
     def _init_critic_update(self):
         """Create minimization operation for critic Q-function.
@@ -743,17 +752,17 @@ class MOPAC(RLAlgorithm):
 
         assert V_target.shape.as_list() == [None, 1]
 
-        V_values = self._V_values = self._Vs([self._observations_ph])
+        V_value = self._V_value = self._Vs([self._observations_ph])
 
-        V_losses = self._V_losses = tf.losses.mean_squared_error(
-                labels=V_target, predictions=V_values, weights=0.5)
+        V_loss = self._V_loss = tf.losses.mean_squared_error(
+                labels=V_target, predictions=V_value, weights=0.5)
 
         self._V_optimizers = tf.train.AdamOptimizer(
                 learning_rate=self._V_lr,
                 name='{}_optimizer'.format(self._Vs._name)
             )
         V_training_ops = tf.contrib.layers.optimize_loss(
-                V_losses,
+                V_loss,
                 self.global_step,
                 learning_rate=self._V_lr,
                 optimizer=self._V_optimizers,
@@ -875,8 +884,8 @@ class MOPAC(RLAlgorithm):
             ])
 
         source_params = self._Vs.get_weights()
-        target_params = self._V_targets.get_weights()
-        self._V_targets.set_weights([
+        target_params = self._V_target.get_weights()
+        self._V_target.set_weights([
             tau * source + (1.0 - tau) * target
             for source, target in zip(source_params, target_params)
         ])
@@ -944,9 +953,9 @@ class MOPAC(RLAlgorithm):
         if np.mean(Q_losses) > 1e4:
             raise Exception("Q value", actions)
 
-        (V_values, V_losses, alpha, global_step) = self._session.run(
-            (self._V_values,
-             self._V_losses,
+        (V_value, V_loss, alpha, global_step) = self._session.run(
+            (self._V_value,
+             self._V_loss,
              self._alpha,
              self.global_step),
             feed_dict)
@@ -955,9 +964,9 @@ class MOPAC(RLAlgorithm):
             'Q-avg': np.mean(Q_values),
             'Q-std': np.std(Q_values),
             'Q_loss': np.mean(Q_losses),
-            'V-avg': np.mean(V_values),
-            'V-std': np.std(V_values),
-            'V_loss': np.mean(V_losses),
+            'V-avg': np.mean(V_value),
+            'V-std': np.std(V_value),
+            'V_loss': np.mean(V_loss),
             'alpha': alpha,
         })
 
