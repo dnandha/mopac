@@ -475,17 +475,12 @@ class MOPAC(RLAlgorithm):
             obs = next_obs if mopac else next_obs[nonterm_mask]  # making changes the shape of the array!
 
         if mopac:
-            # VF on final state, replaces terminal reward
+            # VF on final state, appends terminal reward
             if valuefunc:
                 # previous next obs becomes last obs for storage
                 x_obs[:,-1] = next_obs
-                # predict terminal reward (normalized dsr)
-                x_total_reward[:,-1] = self._V_target.predict([x_obs[:,-1]])
-
-                #x_total_reward[:,-1] = self._Vs.predict([x_obs[:,-1]])
-                #next_Qs_values = tuple(Q.predict([obs, next_actions])
-                #    for Q in self._Q_targets)
-                #min_next_Q = tf.reduce_min(next_Qs_values, axis=0)
+                # predict and store reward (incl gamma decay) and observation
+                x_total_reward[:,-1] = (gamma**horiz) * self._V_target.predict([x_obs[:,-1]])
 
             x_opt_acts = np.zeros((self._rollout_batch_size, self._rollout_length, self._action_shape[0]))
             x_opt_obs = np.zeros((self._rollout_batch_size, *self._observation_shape))
