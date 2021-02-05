@@ -64,6 +64,7 @@ class MOPAC(RLAlgorithm):
             num_networks=7,
             num_elites=5,
             model_retain_epochs=20,
+            model_train_end_epoch=-1,
             rollout_batch_size=100e3,
             real_ratio=0.1,
             ratio_schedule=[0,100,0.5,0.5],
@@ -114,8 +115,9 @@ class MOPAC(RLAlgorithm):
         self._valuefunc = valuefunc
 
         self._model_retain_epochs = model_retain_epochs
-
         self._model_train_freq = model_train_freq
+        self._model_train_end_epoch = model_train_end_epoch
+
         self._rollout_batch_size = int(rollout_batch_size)
         self._deterministic_obs = deterministic_obs
         self._deterministic_rewards = deterministic_rewards
@@ -194,11 +196,11 @@ class MOPAC(RLAlgorithm):
         pool = self._pool
         model_metrics = {}
 
-        #if not self._training_started:
-        self._init_training()
+        if not self._training_started:
+            self._init_training()
 
-        self._initial_exploration_hook(
-            training_environment, self._initial_exploration_policy, pool)
+            self._initial_exploration_hook(
+                training_environment, self._initial_exploration_policy, pool)
 
         self.sampler.initialize(training_environment, policy, pool)
 
@@ -240,11 +242,13 @@ class MOPAC(RLAlgorithm):
                         self._epoch, self._model_train_freq, self._timestep, self._total_timestep, self._train_steps_this_epoch, self._num_train_steps)
                     )
 
-                    model_train_metrics = self._train_model(batch_size=256, max_epochs=None, holdout_ratio=0.2, max_t=self._max_model_t)
-                    model_metrics.update(model_train_metrics)
-                    gt.stamp('epoch_train_model')
+                    if self._epoch < self._model_train_end_epoch or self._model_train_end_epoch == -1:
+                        model_train_metrics = self._train_model(batch_size=256, max_epochs=None, holdout_ratio=0.2, max_t=self._max_model_t)
+                        model_metrics.update(model_train_metrics)
+                        gt.stamp('epoch_train_model')
                     
                     self._reallocate_model_pool()
+
                     model_rollout_metrics = self._rollout_model(gamma=self._discount, mopac=self._mopac, valuefunc=self._valuefunc,
                                                                 deterministic_obs=self._deterministic_obs, deterministic_rewards=self._deterministic_rewards)
                     model_metrics.update(model_rollout_metrics)
@@ -399,7 +403,10 @@ class MOPAC(RLAlgorithm):
             print('[ MOPAC ] Updating model pool | {:.2e} --> {:.2e}'.format(
                 self._model_pool._max_size, new_pool_size
             ))
-            self._model_pool._size = new_pool_size
+
+            if new_pool_size < self._model_pool._size:
+                self._model_pool._size = new_pool_size
+
             samples = self._model_pool.return_all_samples()
             new_pool = SimpleReplayPool(obs_space, act_space, new_pool_size)
             new_pool.add_samples(samples)
@@ -944,9 +951,6 @@ class MOPAC(RLAlgorithm):
              self.global_step,
              self._actions_ph),
             feed_dict)
-
-        if np.mean(Q_losses) > 1e4:
-            raise Exception("Q value", actions)
 
         (V_value, V_loss, alpha, global_step) = self._session.run(
             (self._V_value,

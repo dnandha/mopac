@@ -5,7 +5,7 @@ params = {
     'task': 'v2',
 
     'log_dir': '~/ray_mopac/',
-    'exp_name': 'fixedv3',
+    'exp_name': 'new_v_model_cap',
 
     'kwargs': {
         'epoch_length': 1000,
@@ -23,11 +23,12 @@ params = {
         'valuefunc': True,
         'deterministic_obs': False,
         'deterministic_rewards': False,
-        'rollout_schedule': [0, 80, 5, 15],
+        'rollout_schedule': [0, 80, 5, 5],
         'ratio_schedule': [0, 80, 0.8, 0.8],
         'rollout_batch_size': 10000,
 
         'model_train_freq': 250,
+        'model_train_end_epoch': 80,
         'model_retain_epochs': 1,
         'num_networks': 7,
         'num_elites': 5,
