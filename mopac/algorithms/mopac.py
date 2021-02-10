@@ -436,10 +436,8 @@ class MOPAC(RLAlgorithm):
             x_obs = np.zeros((self._rollout_batch_size*self.repeats, self._rollout_length, *self._observation_shape))
             x_total_reward = np.zeros((self._rollout_batch_size*self.repeats, self._rollout_length, 1))
 
-            # fix model inds across rollouts
-            # TODO: and initial states?
-            #model_inds = self._model.random_inds(self._rollout_batch_size).repeat(self.repeats)
-            model_inds = self._model.random_inds(self._rollout_batch_size*self.repeats)
+            # fix model inds across rollouts and initial state batch
+            model_inds = self._model.random_inds(self._rollout_batch_size).repeat(self.repeats)
 
         # rollouts
         # in mopac last step is replaced by value func
