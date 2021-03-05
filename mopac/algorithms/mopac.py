@@ -55,7 +55,7 @@ class MOPAC(RLAlgorithm):
             reparameterize=False,
             store_extra_policy_info=False,
 
-            mopac=False,
+            mopac=True,
             valuefunc=False,
             deterministic_obs=False,
             deterministic_rewards=False,
@@ -389,6 +389,7 @@ class MOPAC(RLAlgorithm):
         act_space = self._pool._action_space
 
         rollouts_per_epoch = self._rollout_batch_size * self._epoch_length / self._model_train_freq
+        
         #rollouts_per_epoch = self._epoch_length / self._model_train_freq
         model_steps_per_epoch = int(self._rollout_length * rollouts_per_epoch)
         new_pool_size = self._model_retain_epochs * model_steps_per_epoch
@@ -420,7 +421,7 @@ class MOPAC(RLAlgorithm):
         return model_metrics
 
     # TODO: refactor, extract functions
-    def _rollout_model(self, gamma=0.9, lambda_=1.0, mopac=False, valuefunc=False, deterministic_obs=False, deterministic_rewards=False):
+    def _rollout_model(self, gamma=0.99, lambda_=1.0, mopac=False, valuefunc=False, deterministic_obs=False, deterministic_rewards=False):
         print('[ Model Rollout ] Starting | Epoch: {} | Rollout length: {} | Batch size: {}'.format(
             self._epoch, self._rollout_length, self._rollout_batch_size
         ))
@@ -469,7 +470,7 @@ class MOPAC(RLAlgorithm):
                 x_obs[:,t] = obs
                 x_acts[:,t] = act
             else:
-                samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'cumrewards': rew}
+                samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term}
                 self._model_pool.add_samples(samples)
 
             nonterm_mask = ~term.squeeze(-1)
@@ -505,6 +506,7 @@ class MOPAC(RLAlgorithm):
 
                 # compute control offset (most important part in mppi)
                 u_delta = np.sum((omega.squeeze() * self.noise[r].T).T, axis=0)
+                print(u_delta)
 
                 # tweak control (duplicated across range)
                 #self.U[r] += 1 * u_delta
@@ -537,29 +539,28 @@ class MOPAC(RLAlgorithm):
                 next_obs, rew, term, info = self.fake_env.step(obs, act, model_inds,
                                                                 deterministic_obs=deterministic_obs,
                                                                 deterministic_rewards=deterministic_rewards)
-
-                # gamma decay on reward, update cum reward
-                rew *= (gamma**t)
-
+                
                 # store sample
-                samples += [{'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term}]
+                samples={'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term}
+                self._model_pool.add_samples(samples)
+
+                
+                # rew *= (gamma**t)
 
                 obs = next_obs
-
             # cum rewards: potential reward, decreases with every step in trajectory
             # for last step the cum reward becomes the reward of just that step
             # ex.: rew=(1,2,3,4,5) -> cumrewards=(15,14,12,9,5)
-            rews = np.array([s['rewards'] for s in samples])
-            cumrewards =  np.flip(np.cumsum(np.flip(rews), axis=0))
-            # normalize
-            cumrewards /= self._rollout_length
+            # cumrews = np.array([s['cumrewards'] for s in samples])
+            # cumrewards =  np.flip(np.cumsum(np.flip(cumrews), axis=0))
+            # # normalize
+            # cumrewards /= self._rollout_length
 
+            # add samples to pool, together with cum rewar
             # add samples to pool, together with cum reward
-            for s, cw in zip(samples, cumrewards):
-                s.update({'cumrewards': cw})
-
+            # for s in zip(samples):
                 # add to pool
-                self._model_pool.add_samples(s)
+                # self._model_pool.add_samples(s)
 
         mean_rollout_length = sum(steps_added) / self._rollout_batch_size
         rollout_stats = {'mean_rollout_length': mean_rollout_length}
@@ -650,11 +651,11 @@ class MOPAC(RLAlgorithm):
             name='terminals',
         )
 
-        self._cumrewards_ph = tf.placeholder(
-            tf.float32,
-            shape=(None, 1),
-            name='cumrewards',
-        )
+        # self._cumrewards_ph = tf.placeholder(
+        #     tf.float32,
+        #     shape=(None, 1),
+        #     name='cumrewards',
+        # )
 
         if self._store_extra_policy_info:
             self._log_pis_ph = tf.placeholder(
@@ -852,7 +853,7 @@ class MOPAC(RLAlgorithm):
     def _init_training(self):
         self._update_target(tau=1.0)
 
-    def _init_mppi(self, hl=0.4, horiz=15, noise_mu=0., noise_sigma=0.5, uclip=1.4, lambda_=1.0, repeats=50):
+    def _init_mppi(self, hl=0.4, horiz=15, noise_mu=0., noise_sigma=0.5, uclip=1.4, lambda_=1.0, repeats=100):
         action_len = self._action_shape[0]
         obs_len = self._observation_shape[0]
         self.repeats = repeats
@@ -915,7 +916,7 @@ class MOPAC(RLAlgorithm):
             self._terminals_ph: batch['terminals']
         }
 
-        feed_dict[self._cumrewards_ph] = batch['cumrewards']
+        # feed_dict[self._cumrewards_ph] = batch['cumrewards']
 
         if self._store_extra_policy_info:
             feed_dict[self._log_pis_ph] = batch['log_pis']

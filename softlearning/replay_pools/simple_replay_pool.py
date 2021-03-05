@@ -64,10 +64,10 @@ class SimpleReplayPool(FlexibleReplayPool):
                     'shape': (1, ),
                     'dtype': 'bool'
                 },
-                'cumrewards': {
-                    'shape': (1, ),
-                    'dtype': 'float32'
-                },
+                # 'cumrewards': {
+                #     'shape': (1, ),
+                #     'dtype': 'float32'
+                # },
             }
         }
 
