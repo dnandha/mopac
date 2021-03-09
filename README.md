@@ -14,7 +14,7 @@ Substantial advancements to model-based reinforcement learning algorithms have b
 ```
 @inproceedings{morgan2021model,
   author = {Andrew Morgan and Daljeet Nandha and Georgia Chalvatzaki and Carlo D'Eramo and Aaron Dollar and Jan Peters},
-  title = {Model Predictive Actor-Critic: Accelerating Robot Skill  Acquisition  with  Deep  Reinforcement  Learning},
+  title = {Model Predictive Actor-Critic: Accelerating Robot Skill Acquisition with Deep Reinforcement Learning},
   booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
   year = {2021}
 }
