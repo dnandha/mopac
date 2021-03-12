@@ -1,5 +1,24 @@
 # Model Predictive Actor-Critic Reinforcement Learning
 
+<p align="center">
+	<img src="https://drive.google.com/uc?export=view&id=1XNVqPc2UdzMWWbHsp0kT40I-BmEngMnk" width="80%">
+</p>
+
+
+## Abstract
+
+Substantial advancements to model-based reinforcement learning algorithms have been impeded by the model-bias induced by the collected data, which generally hurts performance. Meanwhile, their inherent sample efficiency warrants utility for most robot applications, limiting potential damage to the robot and its environment during training. Inspired by information theoretic model predictive control and advances in deep reinforcement learning, we introduce Model Predictive Actor-Critic (MoPAC), a hybrid model-based/model-free method that combines model predictive rollouts with policy optimization as to mitigate model bias. MoPAC leverages optimal trajectories to guide policy learning, but explores via its model-free method, allowing the algorithm to learn more expressive dynamics models. This combination guarantees optimal skill learning up to an approximation error and reduces necessary physical interaction with the environment, making it suitable for real-robot training. We provide extensive results showcasing how our proposed method generally outperforms current state-of-the-art and conclude by evaluating MoPAC for learning on a physical robotic hand performing valve rotation and finger gaiting--a task that requires grasping, manipulation, and then regrasping of an object. 
+
+## Reference
+
+```
+@inproceedings{morgan2021model,
+  author = {Andrew Morgan and Daljeet Nandha and Georgia Chalvatzaki and Carlo D'Eramo and Aaron Dollar and Jan Peters},
+  title = {Model Predictive Actor-Critic: Accelerating Robot Skill Acquisition with Deep Reinforcement Learning},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  year = {2021}
+}
+```
 
 ## Installation
 1. Install MuJoCo (https://www.roboti.us/index.html) at `~/.mujoco/mujoco200` and copy your license key to `~/.mujoco/mjkey.txt`
