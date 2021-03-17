@@ -5,7 +5,7 @@ params = {
     'task': 'v2',
 
     'log_dir': '~/ray_mopac/',
-    'exp_name': 'defaults',
+    'exp_name': 'mopac_entropy0_mix5',
 
     'kwargs': {
         'n_epochs': 80, ## 20k steps
@@ -20,17 +20,20 @@ params = {
         'tau': 5e-3,
         'reward_scale': 1.0,
 
+        'mopac': True,
+        'valuefunc': True,
+        'deterministic_obs': False,
+        'deterministic_rewards': False,
+        'rollout_schedule': [0, 500, 5, 5],
+        'ratio_schedule': [0, 70, 0.05, 0.05],
+        'rollout_batch_size': 10000,
+
         'model_train_freq': 250,
+        'model_train_end_epoch': 70,
         'model_retain_epochs': 1,
-        'rollout_batch_size': 100e3,
-        'deterministic': False,
         'num_networks': 7,
         'num_elites': 5,
-        'real_ratio': 0.05,
-        'target_entropy': -0.05,
+        'target_entropy': 0,
         'max_model_t': None,
-        'rollout_schedule': [1, 15, 1, 1],
-        'hidden_dim': 200,
-        'n_initial_exploration_steps': 500,
     }
 }

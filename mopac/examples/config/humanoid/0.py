@@ -31,7 +31,7 @@ params = {
         'model_retain_epochs': 5,
         'num_networks': 7,
         'num_elites': 5,
-        'target_entropy': -2,
+        'target_entropy': 0,
         'max_model_t': None,
         'hidden_dim': 400,
     }

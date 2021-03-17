@@ -506,7 +506,7 @@ class MOPAC(RLAlgorithm):
 
                 # compute control offset (most important part in mppi)
                 u_delta = np.sum((omega.squeeze() * self.noise[r].T).T, axis=0)
-                print(u_delta)
+                # print(u_delta)
 
                 # tweak control (duplicated across range)
                 #self.U[r] += 1 * u_delta
@@ -806,7 +806,7 @@ class MOPAC(RLAlgorithm):
             self._training_ops.update({
                 'temperature_alpha': self._alpha_train_op
             })
-
+        print('alpha entropy parameter:', alpha)
         self._alpha = alpha
 
         if self._action_prior == 'normal':
