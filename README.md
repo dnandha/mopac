@@ -49,12 +49,17 @@ ray start --block --head --redis-port=6379 --temp-dir=${ray_tmp_dir} &
 mopac run_example_cluster mopac.examples.development --config=mopac.examples.config.${envname}.0
 ```
 
-Restoring a checkpoint:
+Restoring a checkpoint locally:
 ```
 mopac run_local mopac.examples.development --config=mopac.examples.config.${envname}.0 --gpus=1 --trial-gpus=1 --restore=${path_to_checkpoint_ending_with_slash}
 ```
 ```
 for chkpt in $(find ~/ray_mopac/${env_name}/${exp_name} -name checkpoint_${number}); do mopac run_local mopac.examples.development --config=mopac.examples.config.${envname}.0 --gpus=1 --trial-gpus=1 --restore=${chkpt}/; done
+```
+
+Restoring a checkpoint on cluster:
+```
+for chkpt in $(find ~/ray_mopac/${env_name}/${exp_name} -name checkpoint_${number}); do export chkpt=${chkpt}/; sbatch -J ${path_to_job_script}; done
 ```
 
 #### New environments
