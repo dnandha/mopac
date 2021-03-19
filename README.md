@@ -61,6 +61,7 @@ Restoring a checkpoint on cluster:
 ```
 for chkpt in $(find ~/ray_mopac/${env_name}/${exp_name} -name checkpoint_${number}); do export chkpt=${chkpt}/; sbatch -J ${path_to_job_script}; done
 ```
+Job sript must contain `=-restore=${chkpt}`, e.g. `mopac run_example_cluster mopac.examples.development --config=mopac.examples.config.${envname}.0 --restore=${chkpt}`.
 
 #### New environments
 To run on a different environment, you can modify the provided [template](examples/config/custom/0.py). You will also need to provide the termination function for the environment in [`mopac/static`](mopac/static). If you name the file the lowercase version of the environment name, it will be found automatically. See [`hopper.py`](mopac/static/hopper.py) for an example.
