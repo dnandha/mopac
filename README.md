@@ -91,7 +91,7 @@ This corresponds to a model rollout length linearly increasing from 5 to 15 over
 If you want to speed up training in terms of wall clock time (but possibly make the runs less sample-efficient), you can set a timeout for model training ([`max_model_t`](mopac/examples/config/halfcheetah/0.py#L30), in seconds) or train the model less frequently (every [`model_train_freq`](mopac/examples/config/halfcheetah/0.py#L22) steps).
 
 
-## Acknowledgments
+## Acknowledgements
 The underlying soft actor-critic implementation in MOPAC comes from [Tuomas Haarnoja](https://scholar.google.com/citations?user=VT7peyEAAAAJ&hl=en) and [Kristian Hartikainen's](https://hartikainen.github.io/) [softlearning](https://github.com/rail-berkeley/softlearning) codebase. The modeling code is a slightly modified version of [Kurtland Chua's](https://kchua.github.io/) [PETS](https://github.com/kchua/handful-of-trials) implementation.
 
 This code is an extension of [MBPO](https://github.com/JannerM/mbpo) for model predictive rollouts.
