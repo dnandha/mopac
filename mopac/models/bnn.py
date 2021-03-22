@@ -86,6 +86,8 @@ class BNN:
         else:
             print("Created an ensemble of {} neural networks with variance predictions | Elites: {}".format(self.num_nets, self.num_elites))
 
+        self._model_inds = np.arange(self.num_elites).tolist()
+
     @property
     def is_probabilistic(self):
         return True
@@ -275,8 +277,6 @@ class BNN:
         print('Using {} / {} models: {}'.format(self.num_elites, self.num_nets, self._model_inds))
 
     def random_inds(self, batch_size):
-        if self._model_inds is None:
-            self._model_inds = np.arange(self.num_elites).tolist()
         inds = np.random.choice(self._model_inds, size=batch_size)
         return inds
 
