@@ -1,6 +1,6 @@
 # Model Predictive Actor-Critic Reinforcement Learning
 
-Supplemental code for the [ICRA 2021 paper on MoPAC](https://arxiv.org/abs/2103.13842).
+Supplemental code for the [ICRA 2021 paper on MoPAC](https://arxiv.org/abs/2103.13842). [Video](https://youtu.be/ci7TEWn40AA). 
 
 <p align="center">
 	<img src="https://drive.google.com/uc?export=view&id=1XNVqPc2UdzMWWbHsp0kT40I-BmEngMnk" width="80%">
