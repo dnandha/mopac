@@ -10,7 +10,7 @@ dependencies:
   - c-ares=1.16.1=h516909a_3
   - ca-certificates=2020.6.20=hecda079_0
   - certifi=2020.6.20=py36h9f0ad1d_0
-  - cffi=1.11.5=py36_0
+  - cffi=1.14.5=py36h261ae71_0
   - chardet=3.0.4=py36_1003
   - conda=4.8.4=py36_0
   - conda-package-handling=1.6.1=py36h7b6447c_0
