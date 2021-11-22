@@ -2,10 +2,14 @@
 
 Supplemental code for the [ICRA 2021 paper on MoPAC](https://arxiv.org/abs/2103.13842). [Video](https://youtu.be/ci7TEWn40AA). 
 
-<p align="center">
-	<img src="https://drive.google.com/uc?export=view&id=1XNVqPc2UdzMWWbHsp0kT40I-BmEngMnk" width="80%">
-</p>
+<!-- <p align="center"> -->
+<!-- 	<img src="https://drive.google.com/uc?export=view&id=1XNVqPc2UdzMWWbHsp0kT40I-BmEngMnk" width="80%"> -->
+<!-- 		<img src="https://drive.google.com/uc?export=view&id=1qckgdJHKbBinNWolCOSzJC7grhJwJDu6" width="80%"> -->
+<!-- </p> -->
 
+<p align="center">
+<img src="https://github.com/asmorgan24/big_gifs_repo/blob/main/MoPAC_MujocoEnvs.gif" alt="MOPAC showcase gif" title="MOPAC showcase gif" width="80%"/>
+</p>
 
 ## Abstract
 
